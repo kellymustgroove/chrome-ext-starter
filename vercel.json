@@ -1,9 +1,8 @@
 {
+  "framework": null,
   "builds": [{ "src": "api/**/*.js", "use": "@vercel/node" }],
   "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
+    "api/**/*.js": { "runtime": "nodejs18.x" }
   },
   "routes": [{ "src": "/api/(.*)", "dest": "/api/$1.js" }]
 }
