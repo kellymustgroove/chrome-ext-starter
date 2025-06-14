@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: DaisyUI theme config */
+@layer base {
+  :root {
+    --rounded-box: 1rem;
+    --btn-text-case: none;
+  }
+}

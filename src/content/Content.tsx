@@ -121,7 +121,7 @@ export default function Content(): JSX.Element {
             clipRule='evenodd'
           />
         </svg>
-        <input type='password' className='grow' value='password' />
+        <input type='password' className='grow' value='password' readOnly />
       </label>
 
       <input

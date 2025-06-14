@@ -43,7 +43,7 @@ export default defineManifest({
   ],
   web_accessible_resources: [
     {
-      resources: ['*.js', '*.css', 'public/*'],
+      resources: ['*.js', '*.css', 'public/*', 'content.css'],
       matches: ['<all_urls>'],
     },
   ],

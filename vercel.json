@@ -3,3 +3,4 @@
   "builds": [{ "src": "api/analytics.js", "use": "@vercel/node" }],
   "routes": [{ "src": "/api/analytics", "dest": "api/analytics.js" }]
 }
+

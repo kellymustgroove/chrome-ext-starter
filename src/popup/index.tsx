@@ -1,8 +1,10 @@
-import styles from '@assets/styles/index.css?inline';
-import createShadowRoot from '@utils/createShadowRoot';
+// src/popup/index.tsx
 
-import Popup from './Popup';
+import "./index.css";                  // bring in Tailwind
+import { createRoot } from "react-dom/client";
+import Popup from "./Popup";
 
-const root = createShadowRoot(styles);
-
-root.render(<Popup />);
+const container = document.getElementById("root");
+if (container) {
+  createRoot(container).render(<Popup />);
+}

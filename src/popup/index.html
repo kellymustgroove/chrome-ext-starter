@@ -1,12 +1,17 @@
-<!doctype html>
-<html>
+<!-- src/popup/index.html -->
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>my ext popup page</title>
+    <title>Airpath Extension</title>
   </head>
-
   <body>
-    <div id="my-ext-popup-page"></div>
+    <!-- ✅ Add this wrapper with ID to match your postcss-prefix-selector config -->
+    <div id="my-ext">
+      <div id="root"></div>
+    </div>
+
+    <!-- ✅ Leave this as-is -->
     <script type="module" src="./index.tsx"></script>
   </body>
 </html>

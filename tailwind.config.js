@@ -1,9 +1,12 @@
+// tailwind.config.js
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
-  // eslint-disable-next-line import/no-unresolved, global-require
-  plugins: [require('daisyui')],
-  daisyui: {
-    themes: ['light', 'dark'],
+module.exports = {
+  content: [
+    // make sure you’re picking up ALL of your code, including popup:
+    "./src/**/*.{html,js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
   },
+  plugins: [require("daisyui")],
 };
