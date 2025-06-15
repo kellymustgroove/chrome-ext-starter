@@ -20,56 +20,32 @@ export default async function handler(req, res) {
   const { metric } = req.query;
   const dateRanges = getDateRange(req.query);
 
+  if (!metric) {
+    return res.status(400).json({ error: 'Missing metric parameter' });
+  }
+
+  // Support single or multiple metrics (comma-separated)
+  const metricNames = metric
+    .split(',')
+    .map((m) => m.trim())
+    .filter(Boolean);
+  if (metricNames.length === 0) {
+    return res.status(400).json({ error: 'No valid metrics provided' });
+  }
+
   try {
-    if (metric === 'users') {
-      const [response] = await analyticsDataClient.runReport({
-        property: `properties/${PROPERTY_ID}`,
-        dateRanges,
-        metrics: [{ name: 'totalUsers' }],
-      });
-      const users =
-        response.rows?.[0]?.metricValues?.[0]?.value || 'No data available';
-      return res.status(200).json({ users });
-    }
-    if (metric === 'sessions') {
-      const [response] = await analyticsDataClient.runReport({
-        property: `properties/${PROPERTY_ID}`,
-        dateRanges,
-        metrics: [{ name: 'sessions' }],
-      });
-      const sessions =
-        response.rows?.[0]?.metricValues?.[0]?.value || 'No data available';
-      return res.status(200).json({ sessions });
-    }
-    if (metric === 'pageviews') {
-      const [response] = await analyticsDataClient.runReport({
-        property: `properties/${PROPERTY_ID}`,
-        dateRanges,
-        metrics: [{ name: 'screenPageViews' }],
-      });
-      const pageviews =
-        response.rows?.[0]?.metricValues?.[0]?.value || 'No data available';
-      return res.status(200).json({ pageviews });
-    }
-    if (metric === 'top-pages') {
-      const [response] = await analyticsDataClient.runReport({
-        property: `properties/${PROPERTY_ID}`,
-        dateRanges,
-        dimensions: [{ name: 'pagePath' }],
-        metrics: [{ name: 'screenPageViews' }],
-        orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
-        limit: 5,
-      });
-      const topPages =
-        response.rows?.map((row) => ({
-          page: row.dimensionValues?.[0]?.value,
-          pageviews: row.metricValues?.[0]?.value,
-        })) || [];
-      return res.status(200).json({ topPages });
-    }
-    return res
-      .status(400)
-      .json({ error: 'Invalid or missing metric parameter' });
+    const [response] = await analyticsDataClient.runReport({
+      property: `properties/${PROPERTY_ID}`,
+      dateRanges,
+      metrics: metricNames.map((name) => ({ name })),
+    });
+    // Build a result object with all metric values
+    const result = {};
+    metricNames.forEach((name, i) => {
+      result[name] =
+        response.rows?.[0]?.metricValues?.[i]?.value || 'No data available';
+    });
+    return res.status(200).json(result);
   } catch (err) {
     return res
       .status(500)
