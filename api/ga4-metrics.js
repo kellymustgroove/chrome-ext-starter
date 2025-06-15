@@ -1,5 +1,14 @@
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
 
+function getDateRange(query) {
+  const { startDate, endDate } = query;
+  // If both dates are provided, use them; otherwise, default to last 30 days
+  if (startDate && endDate) {
+    return [{ startDate, endDate }];
+  }
+  return [{ startDate: '30daysAgo', endDate: 'yesterday' }];
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -9,12 +18,13 @@ export default async function handler(req, res) {
   const analyticsDataClient = new BetaAnalyticsDataClient({ credentials: key });
   const PROPERTY_ID = '392448310';
   const { metric } = req.query;
+  const dateRanges = getDateRange(req.query);
 
   try {
     if (metric === 'sessions') {
       const [response] = await analyticsDataClient.runReport({
         property: `properties/${PROPERTY_ID}`,
-        dateRanges: [{ startDate: '30daysAgo', endDate: 'yesterday' }],
+        dateRanges,
         metrics: [{ name: 'sessions' }],
       });
       const sessions =
@@ -24,7 +34,7 @@ export default async function handler(req, res) {
     if (metric === 'pageviews') {
       const [response] = await analyticsDataClient.runReport({
         property: `properties/${PROPERTY_ID}`,
-        dateRanges: [{ startDate: '30daysAgo', endDate: 'yesterday' }],
+        dateRanges,
         metrics: [{ name: 'screenPageViews' }],
       });
       const pageviews =
@@ -34,7 +44,7 @@ export default async function handler(req, res) {
     if (metric === 'top-pages') {
       const [response] = await analyticsDataClient.runReport({
         property: `properties/${PROPERTY_ID}`,
-        dateRanges: [{ startDate: '30daysAgo', endDate: 'yesterday' }],
+        dateRanges,
         dimensions: [{ name: 'pagePath' }],
         metrics: [{ name: 'screenPageViews' }],
         orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
