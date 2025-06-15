@@ -21,6 +21,16 @@ export default async function handler(req, res) {
   const dateRanges = getDateRange(req.query);
 
   try {
+    if (metric === 'users') {
+      const [response] = await analyticsDataClient.runReport({
+        property: `properties/${PROPERTY_ID}`,
+        dateRanges,
+        metrics: [{ name: 'totalUsers' }],
+      });
+      const users =
+        response.rows?.[0]?.metricValues?.[0]?.value || 'No data available';
+      return res.status(200).json({ users });
+    }
     if (metric === 'sessions') {
       const [response] = await analyticsDataClient.runReport({
         property: `properties/${PROPERTY_ID}`,
