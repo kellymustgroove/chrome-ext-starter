@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   const key = JSON.parse(process.env.GA4_SERVICE_KEY_JSON);
   const analyticsDataClient = new BetaAnalyticsDataClient({ credentials: key });
   const PROPERTY_ID = '392448310';
-  const { metric } = req.query;
+  const { metric, dimension } = req.query;
   const dateRanges = getDateRange(req.query);
 
   if (!metric) {
@@ -34,11 +34,28 @@ export default async function handler(req, res) {
   }
 
   try {
-    const [response] = await analyticsDataClient.runReport({
+    const reportRequest = {
       property: `properties/${PROPERTY_ID}`,
       dateRanges,
       metrics: metricNames.map((name) => ({ name })),
-    });
+    };
+    if (dimension) {
+      reportRequest.dimensions = [{ name: dimension }];
+    }
+    const [response] = await analyticsDataClient.runReport(reportRequest);
+    if (dimension) {
+      // Return grouped results by dimension
+      const results =
+        response.rows?.map((row) => {
+          const dimValue = row.dimensionValues?.[0]?.value;
+          const metrics = {};
+          metricNames.forEach((name, i) => {
+            metrics[name] = row.metricValues?.[i]?.value || 'No data';
+          });
+          return { [dimension]: dimValue, ...metrics };
+        }) || [];
+      return res.status(200).json({ results });
+    }
     // Build a result object with all metric values
     const result = {};
     metricNames.forEach((name, i) => {
