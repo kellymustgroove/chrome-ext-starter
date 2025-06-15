@@ -6,6 +6,17 @@ const client = new BetaAnalyticsDataClient({
 });
 
 export default async function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return;
+  }
+
   try {
     const [response] = await client.runReport({
       property: `properties/${process.env.GA4_PROPERTY_ID}`,
@@ -22,8 +33,10 @@ export default async function handler(req, res) {
     const summary = summaryLines.join('\n');
 
     res.status(200).json({ summary, rows: response.rows });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: e.message });
+    
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+    
   }
 }
